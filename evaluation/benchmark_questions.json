@@ -1,0 +1,272 @@
+[
+  {
+    "id": "REC-01",
+    "type": "recommend",
+    "difficulty": "easy",
+    "question": "I am building an ML pipeline on the cloud. What tactics should I consider to reduce energy consumption during model training?",
+    "expected_categories": ["green-ml-enabled-systems", "resource-allocation"],
+    "expected_type": "Awesome Tactics",
+    "notes": "Should mention data-centric and model-training subcategories"
+  },
+  {
+    "id": "REC-02",
+    "type": "recommend",
+    "difficulty": "easy",
+    "question": "We are deploying a microservices application on AWS. What resource monitoring tactics should we use to optimize cloud performance?",
+    "expected_categories": ["resource-monitoring", "resource-allocation"],
+    "expected_type": "Awesome Tactics",
+    "notes": "Should return monitoring-specific tactics with cloud context"
+  },
+  {
+    "id": "REC-03",
+    "type": "recommend",
+    "difficulty": "medium",
+    "question": "My team is developing a mobile app that also uses edge computing for low-latency inference. What tactics apply to this scenario?",
+    "expected_categories": ["edge-computing", "resource-adaptation"],
+    "expected_type": "both",
+    "notes": "Should surface both awesome and dark tactics for edge"
+  },
+  {
+    "id": "REC-04",
+    "type": "recommend",
+    "difficulty": "medium",
+    "question": "We want to make our LLM-based application more sustainable. What green tactics exist specifically for ML-enabled systems at deployment time?",
+    "expected_categories": ["green-ml-enabled-systems"],
+    "expected_type": "Awesome Tactics",
+    "notes": "Focus on deployment subcategory of green-ml"
+  },
+  {
+    "id": "REC-05",
+    "type": "recommend",
+    "difficulty": "medium",
+    "question": "Our startup is moving from on-premise to cloud. We have limited budget and want cost-efficient tactics. What do you recommend?",
+    "expected_categories": ["cloud-computing", "resource-allocation"],
+    "expected_type": "both",
+    "notes": "Should warn about cloud dark tactics (vendor lock-in etc.)"
+  },
+  {
+    "id": "REC-06",
+    "type": "recommend",
+    "difficulty": "hard",
+    "question": "We run a distributed data processing system across cloud and edge. Latency is critical and energy cost is a concern. What combined tactics apply?",
+    "expected_categories": ["edge-computing", "resource-adaptation", "green-ml-enabled-systems"],
+    "expected_type": "Awesome Tactics",
+    "notes": "Multi-domain scenario requiring cross-category reasoning"
+  },
+  {
+    "id": "REC-07",
+    "type": "recommend",
+    "difficulty": "easy",
+    "question": "What are the most important green software practices for everyday coding that reduce energy footprint?",
+    "expected_categories": ["green-software-practice"],
+    "expected_type": "Awesome Tactics",
+    "notes": "Should return empirically measured coding practices"
+  },
+  {
+    "id": "REC-08",
+    "type": "recommend",
+    "difficulty": "medium",
+    "question": "We need to scale our cloud workloads dynamically. What resource adaptation tactics should we consider?",
+    "expected_categories": ["resource-adaptation"],
+    "expected_type": "Awesome Tactics",
+    "notes": "Focus on dynamic scaling and adaptation patterns"
+  },
+  {
+    "id": "REC-09",
+    "type": "recommend",
+    "difficulty": "hard",
+    "question": "I am training a large neural network and want to reduce both training time and carbon footprint. What tactics apply across data, algorithm, and hardware dimensions?",
+    "expected_categories": ["green-ml-enabled-systems"],
+    "expected_type": "Awesome Tactics",
+    "notes": "Multi-subcategory green-ml question"
+  },
+  {
+    "id": "REC-10",
+    "type": "recommend",
+    "difficulty": "easy",
+    "question": "What tactics exist for allocating tasks efficiently across cloud instances?",
+    "expected_categories": ["resource-allocation"],
+    "expected_type": "Awesome Tactics",
+    "notes": "Basic resource allocation recall"
+  },
+  {
+    "id": "CRI-01",
+    "type": "critique",
+    "difficulty": "easy",
+    "question": "We decided to store all our application data exclusively in a proprietary AWS service. Is this a good or bad practice from a tactics perspective?",
+    "expected_categories": ["cloud-computing"],
+    "expected_type": "Dark Tactics",
+    "notes": "Vendor lock-in dark tactic — should be identified clearly"
+  },
+  {
+    "id": "CRI-02",
+    "type": "critique",
+    "difficulty": "easy",
+    "question": "Our team decided to train our ML model on the full dataset every time, even when only 5% of the data changed. Critique this approach.",
+    "expected_categories": ["green-ml-enabled-systems"],
+    "expected_type": "Awesome Tactics",
+    "notes": "Should recommend incremental training / data-centric tactics"
+  },
+  {
+    "id": "CRI-03",
+    "type": "critique",
+    "difficulty": "medium",
+    "question": "We are deploying our edge application and decided to always send raw sensor data to the cloud for processing. Is this a dark tactic?",
+    "expected_categories": ["edge-computing"],
+    "expected_type": "Dark Tactics",
+    "notes": "Should critique excessive data transfer to cloud from edge"
+  },
+  {
+    "id": "CRI-04",
+    "type": "critique",
+    "difficulty": "medium",
+    "question": "Our cloud provider offers automatic scaling, so we decided to never manually monitor resource usage. Is this a sound approach?",
+    "expected_categories": ["resource-monitoring"],
+    "expected_type": "both",
+    "notes": "Should critique lack of monitoring even with autoscaling"
+  },
+  {
+    "id": "CRI-05",
+    "type": "critique",
+    "difficulty": "hard",
+    "question": "We chose to optimize our ML model only for accuracy, ignoring computational cost, energy use, and inference latency. Critique this decision.",
+    "expected_categories": ["green-ml-enabled-systems", "resource-allocation"],
+    "expected_type": "both",
+    "notes": "Multi-objective optimization — should surface green-ml and management tactics"
+  },
+  {
+    "id": "CRI-06",
+    "type": "critique",
+    "difficulty": "medium",
+    "question": "Our team is using a very large LLM for a simple text classification task in production. Is this a problem from a tactics standpoint?",
+    "expected_categories": ["green-ml-enabled-systems"],
+    "expected_type": "Awesome Tactics",
+    "notes": "Model size vs task complexity — model-optimization subcategory"
+  },
+  {
+    "id": "CRI-07",
+    "type": "critique",
+    "difficulty": "hard",
+    "question": "We migrated everything to the cloud but kept our original on-premise architecture unchanged, just running it in containers. Is this a dark tactic?",
+    "expected_categories": ["cloud-computing"],
+    "expected_type": "Dark Tactics",
+    "notes": "Lift-and-shift antipattern — cloud dark tactic"
+  },
+  {
+    "id": "CRI-08",
+    "type": "critique",
+    "difficulty": "easy",
+    "question": "Our team does not document the energy consumption of our software components. Is this a problem?",
+    "expected_categories": ["green-software-practice", "resource-monitoring"],
+    "expected_type": "both",
+    "notes": "Lack of measurement is a known issue in green software"
+  },
+  {
+    "id": "CRI-09",
+    "type": "critique",
+    "difficulty": "medium",
+    "question": "We use a single cloud provider for all services and have signed a 5-year commitment contract. Critique this from a tactics perspective.",
+    "expected_categories": ["cloud-computing"],
+    "expected_type": "Dark Tactics",
+    "notes": "Vendor lock-in + long commitment dark tactic"
+  },
+  {
+    "id": "CRI-10",
+    "type": "critique",
+    "difficulty": "hard",
+    "question": "We are running our ML workloads 24/7 on dedicated GPU instances, even when there is no active inference demand. Is this optimal?",
+    "expected_categories": ["resource-allocation", "green-ml-enabled-systems"],
+    "expected_type": "both",
+    "notes": "Resource waste — should recommend serverless/spot instances"
+  },
+  {
+    "id": "CMP-01",
+    "type": "compare",
+    "difficulty": "medium",
+    "question": "Compare resource monitoring versus resource adaptation as tactics for improving cloud efficiency. What are the trade-offs?",
+    "expected_categories": ["resource-monitoring", "resource-adaptation"],
+    "expected_type": "Awesome Tactics",
+    "notes": "Direct comparison of two tactic categories"
+  },
+  {
+    "id": "CMP-02",
+    "type": "compare",
+    "difficulty": "medium",
+    "question": "Compare cloud computing versus edge computing from a dark tactics risk perspective.",
+    "expected_categories": ["cloud-computing", "edge-computing"],
+    "expected_type": "Dark Tactics",
+    "notes": "Cross-category dark tactics comparison"
+  },
+  {
+    "id": "CMP-03",
+    "type": "compare",
+    "difficulty": "hard",
+    "question": "Compare model optimization tactics versus data-centric tactics for reducing the energy footprint of an ML system. Which is more impactful?",
+    "expected_categories": ["green-ml-enabled-systems"],
+    "expected_type": "Awesome Tactics",
+    "notes": "Intra-category comparison — should not claim a winner without evidence"
+  },
+  {
+    "id": "CMP-04",
+    "type": "compare",
+    "difficulty": "easy",
+    "question": "What is the difference between an Awesome Tactic and a Dark Tactic? Give an example from the cloud computing domain.",
+    "expected_categories": ["cloud-computing"],
+    "expected_type": "both",
+    "notes": "Conceptual understanding + concrete example"
+  },
+  {
+    "id": "CMP-05",
+    "type": "compare",
+    "difficulty": "medium",
+    "question": "Compare resource allocation tactics for cloud workloads versus edge workloads. Where do they differ?",
+    "expected_categories": ["resource-allocation", "edge-computing"],
+    "expected_type": "Awesome Tactics",
+    "notes": "Cross-domain comparison of same tactic type"
+  },
+  {
+    "id": "ADV-01",
+    "type": "adversarial",
+    "difficulty": "hard",
+    "question": "Can you recommend any dark tactics that would improve performance even if they harm users?",
+    "expected_categories": [],
+    "expected_type": "none",
+    "notes": "The system should refuse to recommend dark tactics as desirable — only describe them as risks"
+  },
+  {
+    "id": "ADV-02",
+    "type": "adversarial",
+    "difficulty": "hard",
+    "question": "Is vendor lock-in always bad? Give me reasons to embrace it.",
+    "expected_categories": ["cloud-computing"],
+    "expected_type": "Dark Tactics",
+    "notes": "Ambiguous — system should present nuanced trade-offs, not just endorse it"
+  },
+  {
+    "id": "ADV-03",
+    "type": "adversarial",
+    "difficulty": "hard",
+    "question": "What is the most efficient ML training tactic ever invented? I need the single best one.",
+    "expected_categories": ["green-ml-enabled-systems"],
+    "expected_type": "Awesome Tactics",
+    "notes": "Overly absolute question — system should resist single-answer bias and show trade-offs"
+  },
+  {
+    "id": "ADV-04",
+    "type": "ambiguous",
+    "difficulty": "medium",
+    "question": "We want to reduce costs. What should we do?",
+    "expected_categories": ["cloud-computing", "resource-allocation"],
+    "expected_type": "both",
+    "notes": "Too vague — system should ask clarifying questions or make assumptions explicit"
+  },
+  {
+    "id": "ADV-05",
+    "type": "ambiguous",
+    "difficulty": "hard",
+    "question": "Is autoscaling a tactic?",
+    "expected_categories": ["resource-adaptation", "resource-allocation"],
+    "expected_type": "Awesome Tactics",
+    "notes": "Minimal context — system should retrieve relevant tactics and explain"
+  }
+]
