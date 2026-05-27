@@ -51,13 +51,17 @@ source .venv/bin/activate
 pip install -r requirements.txt
 ```
 
-### 2. Clone the AADT knowledge base (if not already present)
+### 2. Configure environment
+
+Copy `.env.example` to `.env` and set LLM keys. For indexing, optionally set `GITHUB_TOKEN` (raises API rate limits; public repo works without it).
 
 ```bash
-git clone https://github.com/S2-group/AwesomeAndDarkTactics.git data/aadt-repo
+cp .env.example .env   # Windows: copy .env.example .env
 ```
 
 ### 3. Build the vector index
+
+Fetches tactic markdown from GitHub (`S2-group/AwesomeAndDarkTactics`) and embeds into `data/chroma_db`. Re-runs are fast if the index already exists.
 
 ```bash
 python -m ingestion.build_index
@@ -65,28 +69,55 @@ python -m ingestion.build_index
 
 ### 4. Configure LLM providers
 
-Copy `.env.example` to `.env` and set your keys:
-
-```bash
-cp .env.example .env
-```
-
-Edit `.env`:
+Edit `.env` (LLM section):
 ```
 NEBULA_API_BASE=http://your-nebula-host:11434/v1
 NEBULA_MODEL_1=llama3
 NEBULA_MODEL_2=mistral
+NEBULA_API_KEY=<your nebula api key or 'nebula'>
 OPENAI_API_KEY=sk-your-key
 OPENAI_MODEL=gpt-4o-mini
 ```
 
-If you don't set any providers, the sidebar will show manual configuration fields.
+If you don't set any provider models, the app defaults to Nebula with `llama3` (using `NEBULA_API_BASE`).
 
 ### 5. Run the app
 
 ```bash
 streamlit run app/main.py
 ```
+
+## Website integration (floating chat widget)
+
+This repo now also ships a tiny HTTP API + embeddable widget (a small circle button that opens a side panel).
+
+### 1) Run the API server
+
+```bash
+uvicorn app.server:app --reload --port 8000
+```
+
+### 2) Embed on your tactics website
+
+Add this to the website HTML (e.g. your Jekyll layout/footer):
+
+```html
+<script
+  src="http://localhost:8000/widget.js"
+  data-api-base="http://localhost:8000"
+  data-title="Tactics Copilot"
+  data-subtitle="Ask about tactics"
+  data-mode="recommend"
+  data-top-k="8"
+></script>
+```
+
+### Notes
+
+- The widget calls `POST /api/chat` on this server.
+- On first start (or missing index), the server fetches AADT markdown from GitHub and builds/uses the Chroma index in `data/chroma_db`. Later starts reuse the local index only.
+- To allow the website domain to call the API, set:
+  - `CORS_ALLOW_ORIGINS=https://s2group.cs.vu.nl,https://your-domain.example`
 
 ## Running Benchmarks
 
@@ -109,8 +140,9 @@ app/
   config.py        — Provider config, Pydantic schemas, paths
   prompts.py       — Frozen prompt templates + guardrails (v1.1)
 ingestion/
-  load_aadt.py     — Parse AADT markdown tactics + metadata
-  build_index.py   — Chunk, embed, index into Chroma
+  github_aadt.py   — Fetch AADT markdown from GitHub API
+  load_aadt.py     — Parse tactics + category metadata
+  build_index.py   — Embed and index into Chroma
 rag/
   retriever.py     — Top-k retrieval with optional category filter
   pipeline.py      — Mode routing + LLM call + JSON parsing
@@ -123,8 +155,7 @@ evaluation/
   score.py         — Groundedness, citation, parse, safety metrics
 reports/           — Generated report artifacts
 data/
-  aadt-repo/       — Cloned AADT repository
-  chroma_db/       — Persisted vector index
+  chroma_db/       — Persisted vector index (GitHub fetch only when building)
 ```
 
 ## Benchmark Metrics
@@ -156,6 +187,7 @@ data/
 - Streamlit
 - LangChain (concepts) + OpenAI client
 - ChromaDB + sentence-transformers (all-MiniLM-L6-v2)
+- PyGithub (GitHub Contents API for AADT markdown)
 - Nebula / Ollama (open-source LLMs)
 - OpenAI API (commercial LLM)
 - Plotly + Pandas (benchmark visualization)

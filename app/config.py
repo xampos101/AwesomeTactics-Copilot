@@ -12,10 +12,14 @@ load_dotenv()
 
 ROOT_DIR = Path(__file__).resolve().parent.parent
 DATA_DIR = ROOT_DIR / "data"
-AADT_REPO_DIR = DATA_DIR / "aadt-repo"
-AADT_POSTS_DIR = AADT_REPO_DIR / "docs" / "_posts"
-AADT_CATEGORIES_DIR = AADT_REPO_DIR / "docs" / "categories"
 CHROMA_DIR = DATA_DIR / "chroma_db"
+
+# AADT knowledge base on GitHub (fetched via API; no local clone).
+GITHUB_REPO = os.getenv("GITHUB_REPO", "S2-group/AwesomeAndDarkTactics")
+GITHUB_BRANCH = os.getenv("GITHUB_BRANCH", "main")
+GITHUB_TOKEN = os.getenv("GITHUB_TOKEN", "")
+AADT_POSTS_PREFIX = os.getenv("AADT_POSTS_PREFIX", "docs/_posts")
+AADT_CATEGORIES_PREFIX = os.getenv("AADT_CATEGORIES_PREFIX", "docs/categories")
 REPORTS_DIR = ROOT_DIR / "reports"
 EVAL_DIR = ROOT_DIR / "evaluation"
 
@@ -39,17 +43,29 @@ def get_providers() -> list[ProviderConfig]:
     providers: list[ProviderConfig] = []
 
     nebula_base = os.getenv("NEBULA_API_BASE", "http://localhost:11434/v1")
-    for i in (1, 2):
-        model = os.getenv(f"NEBULA_MODEL_{i}")
-        if model:
-            providers.append(
-                ProviderConfig(
-                    name=f"Nebula ({model})",
-                    api_base=nebula_base,
-                    model=model,
-                    api_key=os.getenv("NEBULA_API_KEY", "nebula"),
-                )
+
+    # Prefer Nebula by default: if NEBULA_MODEL_1 isn't configured, assume a
+    # common default model name so the app works with minimal setup.
+    nebula_model_1 = os.getenv("NEBULA_MODEL_1") or os.getenv("NEBULA_MODEL") or "llama3"
+    nebula_model_2 = os.getenv("NEBULA_MODEL_2")
+    if nebula_model_1:
+        providers.append(
+            ProviderConfig(
+                name=f"Nebula ({nebula_model_1})",
+                api_base=nebula_base,
+                model=nebula_model_1,
+                api_key=os.getenv("NEBULA_API_KEY", "nebula"),
             )
+        )
+    if nebula_model_2:
+        providers.append(
+            ProviderConfig(
+                name=f"Nebula ({nebula_model_2})",
+                api_base=nebula_base,
+                model=nebula_model_2,
+                api_key=os.getenv("NEBULA_API_KEY", "nebula"),
+            )
+        )
 
     openai_key = os.getenv("OPENAI_API_KEY", "")
     openai_model = os.getenv("OPENAI_MODEL", "gpt-4o-mini")

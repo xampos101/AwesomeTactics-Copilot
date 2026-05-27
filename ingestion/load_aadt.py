@@ -1,14 +1,18 @@
-"""Load and normalize all AADT tactic documents from the cloned repo."""
+"""Load and normalize AADT tactic documents from GitHub."""
 
 from __future__ import annotations
 
 import re
-from pathlib import Path
+from pathlib import PurePosixPath
 from typing import Any
 
 import yaml
 
-from app.config import AADT_BASE_URL, AADT_CATEGORIES_DIR, AADT_POSTS_DIR
+from app.config import AADT_BASE_URL, AADT_CATEGORIES_PREFIX, AADT_POSTS_PREFIX
+from ingestion.github_aadt import fetch_aadt_markdown_files
+
+_POSTS_PREFIX = AADT_POSTS_PREFIX.rstrip("/") + "/"
+_CATEGORIES_PREFIX = AADT_CATEGORIES_PREFIX.rstrip("/") + "/"
 
 
 def _parse_frontmatter(text: str) -> tuple[dict[str, Any], str]:
@@ -24,14 +28,30 @@ def _parse_frontmatter(text: str) -> tuple[dict[str, Any], str]:
     return meta, body
 
 
-def load_categories() -> dict[str, dict[str, str]]:
-    """Return {category_name: {description, type}} from category markdown files."""
+def _category_files(files: dict[str, str]) -> dict[str, str]:
+    return {
+        path: text
+        for path, text in files.items()
+        if path.replace("\\", "/").startswith(_CATEGORIES_PREFIX)
+        and path.endswith((".md", ".markdown"))
+    }
+
+
+def _post_files(files: dict[str, str]) -> dict[str, str]:
+    return {
+        path: text
+        for path, text in files.items()
+        if path.replace("\\", "/").startswith(_POSTS_PREFIX)
+        and path.endswith((".md", ".markdown"))
+    }
+
+
+def load_categories_from_files(files: dict[str, str]) -> dict[str, dict[str, str]]:
+    """Return {category_name: {description, type}} from markdown paths + content."""
     categories: dict[str, dict[str, str]] = {}
-    if not AADT_CATEGORIES_DIR.exists():
-        return categories
-    for path in AADT_CATEGORIES_DIR.glob("*.md"):
-        meta, _ = _parse_frontmatter(path.read_text(encoding="utf-8"))
-        name = meta.get("category-name", path.stem)
+    for path, raw in sorted(_category_files(files).items()):
+        meta, _ = _parse_frontmatter(raw)
+        name = meta.get("category-name", PurePosixPath(path).stem)
         categories[name] = {
             "description": meta.get("category-description", ""),
             "type": meta.get("category-type", ""),
@@ -39,20 +59,11 @@ def load_categories() -> dict[str, dict[str, str]]:
     return categories
 
 
-def load_tactics() -> list[dict[str, Any]]:
-    """Parse every tactic post and return a normalized list of dicts.
-
-    Each dict has: title, category, tactic_type, description, tags,
-    participant, context, intent, target_qa, related_qa,
-    measured_impact, source, source_doi, url, file_path, full_text.
-    """
+def load_tactics_from_files(files: dict[str, str]) -> list[dict[str, Any]]:
+    """Parse tactic posts from markdown paths + content."""
     tactics: list[dict[str, Any]] = []
-    if not AADT_POSTS_DIR.exists():
-        return tactics
 
-    all_paths = list(AADT_POSTS_DIR.rglob("*.md")) + list(AADT_POSTS_DIR.rglob("*.markdown"))
-    for md_path in sorted(set(all_paths)):
-        raw = md_path.read_text(encoding="utf-8", errors="replace")
+    for path, raw in sorted(_post_files(files).items()):
         meta, body = _parse_frontmatter(raw)
         if not meta.get("title"):
             continue
@@ -78,10 +89,10 @@ def load_tactics() -> list[dict[str, Any]]:
         source_doi = str(meta.get("t-source-doi", "")).strip('" ')
         countermeasure = str(meta.get("t-countermeasure", "")).strip('" ')
 
-        slug = md_path.stem
+        slug = PurePosixPath(path).stem
         date_prefix = re.match(r"\d{4}-\d{2}-\d{2}-", slug)
         if date_prefix:
-            slug = slug[date_prefix.end():]
+            slug = slug[date_prefix.end() :]
         url = f"{AADT_BASE_URL}/{category}/{slug}/"
 
         full_text_parts = [
@@ -115,11 +126,23 @@ def load_tactics() -> list[dict[str, Any]]:
                 "source": source,
                 "source_doi": source_doi,
                 "url": url,
-                "file_path": str(md_path),
+                "file_path": path,
                 "full_text": full_text,
             }
         )
     return tactics
+
+
+def load_categories() -> dict[str, dict[str, str]]:
+    """Fetch AADT category metadata from GitHub."""
+    files = fetch_aadt_markdown_files()
+    return load_categories_from_files(files)
+
+
+def load_tactics() -> list[dict[str, Any]]:
+    """Fetch and parse all AADT tactic posts from GitHub."""
+    files = fetch_aadt_markdown_files()
+    return load_tactics_from_files(files)
 
 
 if __name__ == "__main__":

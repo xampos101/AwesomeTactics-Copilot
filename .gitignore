@@ -3,7 +3,6 @@ __pycache__/
 *.pyc
 .env
 data/chroma_db/
-data/aadt-repo/
 *.egg-info/
 .cursor/
 reports/*.md

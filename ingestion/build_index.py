@@ -4,22 +4,36 @@ from __future__ import annotations
 
 import json
 import shutil
+import time
 from pathlib import Path
 
 import chromadb
 from chromadb.utils.embedding_functions import SentenceTransformerEmbeddingFunction
 
-from app.config import CHROMA_DIR, DATA_DIR
+from app.config import CHROMA_DIR, DATA_DIR, GITHUB_REPO
+from ingestion.github_aadt import clear_aadt_cache
 from ingestion.load_aadt import load_categories, load_tactics
 
 COLLECTION_NAME = "aadt_tactics"
 EMBEDDING_MODEL = "all-MiniLM-L6-v2"
 
 
+def safe_rmtree(path: Path) -> None:
+    for _ in range(3):
+        try:
+            shutil.rmtree(path)
+            return
+        except PermissionError:
+            time.sleep(1)
+    print(f"Could not delete {path}, continuing anyway...")
+
+
 def build_index(force_rebuild: bool = False) -> chromadb.Collection:
     """Create or return the Chroma collection over AADT tactics."""
-    if force_rebuild and CHROMA_DIR.exists():
-        shutil.rmtree(CHROMA_DIR)
+    if force_rebuild:
+        clear_aadt_cache()
+        if CHROMA_DIR.exists():
+            safe_rmtree(CHROMA_DIR)
 
     CHROMA_DIR.mkdir(parents=True, exist_ok=True)
     ef = SentenceTransformerEmbeddingFunction(model_name=EMBEDDING_MODEL)
@@ -42,7 +56,10 @@ def build_index(force_rebuild: bool = False) -> chromadb.Collection:
     tactics = load_tactics()
 
     if not tactics:
-        raise RuntimeError("No tactics found. Did you clone the AADT repo?")
+        raise RuntimeError(
+            "No tactics found. Check GitHub access (GITHUB_TOKEN) and "
+            f"repo settings ({GITHUB_REPO})."
+        )
 
     ids: list[str] = []
     documents: list[str] = []
@@ -100,7 +117,7 @@ def get_collection() -> chromadb.Collection:
 
 
 if __name__ == "__main__":
-    col = build_index(force_rebuild=True)
+    col = build_index(force_rebuild=False)
     print(f"Collection has {col.count()} documents")
 
     results = col.query(query_texts=["energy efficient ML training"], n_results=3)
